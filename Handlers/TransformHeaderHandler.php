@@ -50,38 +50,28 @@ class TransformHeaderHandler implements ContainerAwareInterface, RequestHandlerI
      */
     function handleRequest(array $annotations, FilterControllerEvent $event)
     {
-
         $headers = $event->getRequest()->headers;
         foreach ($annotations as $annot) {
             if ($headers->has($annot->getHeader())) {
-
                 $hvalues = $headers->get($annot->getHeader());
                 if (!is_array($hvalues)) {
                     $hvalues = array($hvalues);
                 }
                 $rvalues = array();
-
                 if (!$this->container->has($annot->getService())) {
-
                     throw new \RuntimeException('Service ' . $annot->getService() . ' not found');
                 }
                 $transformer = $this->container->get($annot->getService());
-
                 if (!$transformer) {
-
                     throw new \RuntimeException('Service not found ' . $annot->getService());
                 }
                 if (!method_exists($transformer, $annot->getMethod())) {
                     throw new \RuntimeException('Method in service not found ' . $annot->getService() . ':' . $annot->getMethod());
                 }
-
                 foreach ($hvalues as $h) {
                     $rvalues[] = $transformer->{$annot->getMethod()}($h);
                 }
-
                 $headers->set($annot->getHeader(), $rvalues);
-
-
             }
         }
     }

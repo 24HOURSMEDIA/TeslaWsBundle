@@ -45,7 +45,7 @@ class JsonHandler implements ViewHandlerInterface, ExceptionHandlerInterface
     function handleException(array $annotations, GetResponseForExceptionEvent $event)
     {
 
-        $annotation = $annotations[0];
+        // $annotation = $annotations[0];
         $exception = $event->getException();
         if ($exception  instanceof HttpException) {
             $error = new \stdClass();
@@ -84,7 +84,7 @@ class JsonHandler implements ViewHandlerInterface, ExceptionHandlerInterface
      */
     function handleView(array $annotations, GetResponseForControllerResultEvent $event)
     {
-        $annotation = $annotations[0];
+        // $annotation = $annotations[0];
         $event->setResponse(
             Response::create(
                 json_encode($event->getControllerResult()),
