@@ -21,7 +21,7 @@ use Tesla\Bundle\WsBundle\Annotation\Vary;
 /**
  * Class VaryHandler
  * @package Tesla\Bundle\WsBundle\Handlers
- * @DI\Service("tesla_ws.vary_handler")
+ *
  */
 class VaryHandler implements RequestHandlerInterface, ResponseHandlerInterface
 {

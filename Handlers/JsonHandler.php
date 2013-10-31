@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 /**
  * Class JsonHandler
  * @package Tesla\Bundle\WsBundle\Handlers
- * @DI\Service("tesla_ws.json_handler")
+ *
  */
 class JsonHandler implements ViewHandlerInterface, ExceptionHandlerInterface
 {
