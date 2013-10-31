@@ -13,14 +13,15 @@ namespace Tesla\Bundle\WsBundle\Annotation;
 
 
 /**
- * Class JsonOutput
+ * Class Json
  * Serializes the output of the controller as JSON
  * and handles errors as json errors
  *
  * @package Tesla\Bundle\WsBundle\Annotation
  * @Annotation
  */
-final class Json extends Annotation {
+final class Json extends Annotation
+{
 
     /**
      * Returns the alias name for an annotated configuration.

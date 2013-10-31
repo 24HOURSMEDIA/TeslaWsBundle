@@ -10,20 +10,22 @@
  */
 
 namespace Tesla\Bundle\WsBundle\Handlers;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Tesla\Bundle\WsBundle\Annotation\Annotation;
 
-interface ResponseHandlerInterface {
+interface ResponseHandlerInterface
+{
 
     /**
      * Called when a controller returns a response object
      * Modify the response here..
      *
-     * @param Annotation $annotation
+     * @param Annotation[] $annotations
      * @param Response $response
      * @return Response
      */
-    function handleResponse(Annotation $annotation, FilterResponseEvent $event);
+    function handleResponse(array $annotations, FilterResponseEvent $event);
 } 

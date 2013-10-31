@@ -17,15 +17,16 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Tesla\Bundle\WsBundle\Annotation\Annotation;
 
-interface ViewHandlerInterface {
+interface ViewHandlerInterface
+{
 
     /**
      * Called when the controller does not return a response object but data
      * Convert this to a response
      *
-     * @param Annotation $annotation
+     * @param Annotation[] $annotations
      * @param GetResponseForControllerResultEvent $event
      * @return mixed
      */
-    function handleView(Annotation $annotation, GetResponseForControllerResultEvent $event);
+    function handleView(array $annotations, GetResponseForControllerResultEvent $event);
 }

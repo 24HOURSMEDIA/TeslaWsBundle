@@ -11,12 +11,10 @@
 
 namespace Tesla\Bundle\WsBundle\Handlers;
 
-use JMS\DiExtraBundle\Annotation as DI;
 
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Tesla\Bundle\WsBundle\Annotation\Annotation;
-
 use Tesla\Bundle\ClientBundle\Client\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -38,13 +36,13 @@ class JsonHandler implements ViewHandlerInterface, ExceptionHandlerInterface
      * Called when the controller does throws an exception
      * Convert this to a response
      *
-     * @param Annotation $annotation
+     * @param Annotation[] $annotations
      * @param GetResponseForControllerResultEvent $event
      * @return mixed
      */
-    function handleException(Annotation $annotation, GetResponseForExceptionEvent $event)
+    function handleException(array $annotations, GetResponseForExceptionEvent $event)
     {
-
+        $annotation = $annotations[0];
         $exception = $event->getException();
         if ($exception  instanceof HttpException) {
             $error = new \stdClass();
@@ -77,13 +75,13 @@ class JsonHandler implements ViewHandlerInterface, ExceptionHandlerInterface
      * Called when the controller does not return a response object but data
      * Convert this to a response
      *
-     * @param Annotation $annotation
+     * @param Annotation[] $annotations
      * @param GetResponseForControllerResultEvent $event
      * @return mixed
      */
-    function handleView(Annotation $annotation, GetResponseForControllerResultEvent $event)
+    function handleView(array $annotations, GetResponseForControllerResultEvent $event)
     {
-
+        $annotation = $annotations[0];
         $event->setResponse(
             Response::create(
                 json_encode($event->getControllerResult()),

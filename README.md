@@ -1,7 +1,6 @@
 TeslaWsBundle
 =============
 
-SF2 Tesla Webservice Bundle
+Tools for creation of webservices
 
-
---
+Please read the [bundle documentation](Resources/doc/index.md)

@@ -14,14 +14,16 @@ namespace Tesla\Bundle\WsBundle\Handlers;
 
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Tesla\Bundle\WsBundle\Annotation\Annotation;
-interface ExceptionHandlerInterface {
+
+interface ExceptionHandlerInterface
+{
     /**
      * Called when the controller does throws an exception
      * Convert this to a response
      *
-     * @param Annotation $annotation
+     * @param Annotation[] $annotations
      * @param GetResponseForControllerResultEvent $event
      * @return mixed
      */
-    function handleException(Annotation $annotation, GetResponseForExceptionEvent $event);
+    function handleException(array $annotations, GetResponseForExceptionEvent $event);
 } 

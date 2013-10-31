@@ -10,19 +10,21 @@
  */
 
 namespace Tesla\Bundle\WsBundle\Handlers;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Tesla\Bundle\WsBundle\Annotation\Annotation;
 
-interface RequestHandlerInterface {
+interface RequestHandlerInterface
+{
 
     /**
      * Called before controller is called
      *
-     * @param Annotation $annotation
+     * @param Annotation[] $annotations
      * @param Response $response
      * @return Response
      */
-    function handleRequest(Annotation $annotation, FilterControllerEvent $event);
+    function handleRequest(array $annotations, FilterControllerEvent $event);
 
 } 
