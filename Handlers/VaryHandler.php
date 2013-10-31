@@ -41,7 +41,7 @@ class VaryHandler implements RequestHandlerInterface, ResponseHandlerInterface
         // this way other response handlers will have access to them if needed
         $v = array();
         foreach ($annotations as $vary) {
-            $v[] = $vary->getValue();
+            $v[] = $name = implode('-', array_map('ucfirst', explode('-', $vary->getValue())));
         }
 
         $event->getRequest()->attributes->set(self::VARY_ATTRIBUTE_NAME, array_unique($v));

@@ -19,7 +19,7 @@ services:
 
     tesla_ws.handler_activator:
         class: Tesla\Bundle\WsBundle\Listener\HandlerActivator
-        public: false
+        public: true
         arguments:
             - %tesla_ws.reader_cache_path%
             - @annotation_reader
