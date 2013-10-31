@@ -1,0 +1,23 @@
+{
+    "name": "24hoursmedia/tesla-ws-bundle",
+    "description": "SF2 Tesla Webservice vundle",
+    "type": "symfony-bundle",
+    "authors": [
+        {
+            "name": "E.Bachman",
+            "email": "e.bachman@24hoursmedia.com"
+        }
+    ],
+    "keywords": [],
+    "homepage": "http://www.24hoursmedia.com/tesla",
+    "license": [
+        "MIT"
+    ],
+    "autoload": {
+        "psr-0": {
+            "Tesla\\Bundle\\WsBundle": ""
+        }
+    },
+    "target-dir": "Tesla/Bundle/WsBundle",
+    "minimum-stability": "dev"
+}
