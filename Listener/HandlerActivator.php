@@ -80,7 +80,8 @@ class HandlerActivator
 
     public function addHandler($alias, $service)
     {
-        $this->handlers[$alias] = $service;
+
+        $this->handlers[trim($alias)] = $service;
     }
 
     public function setLogger($logger)
@@ -118,29 +119,36 @@ class HandlerActivator
         $object = new \ReflectionClass($className);
         $method = $object->getMethod($controller[1]);
         $responseChain = array();
-        $annotationHandlers = array();
+
         foreach ($this->reader->getMethodAnnotations($method) as $annotation) {
             if ($annotation instanceof WS\Annotation) {
                 $alias = $annotation->getAliasName();
+
                 if (!isset($responseChain[$alias])) {
                     $responseChain[$alias] = array($annotation);
                 } else {
                     $responseChain[$alias][] = $annotation;
                 }
-                if (!isset($annotationHandlers[$alias])) {
-                    $annotationHandlers[$alias] = $this->getHandler($annotation);
+                if (!isset($handlers[$alias])) {
+                    $handlers[$alias] = $this->getHandler($annotation);
                 }
+            }
+        }
+        //var_dump($handlers);exit;
+        // echo '<pre>'; var_dump($annotationHandlers);
+        // resort the response chain so that they correspond to the order in which 'addHandlers' were added
+        $sortedHandlers = array();
+        foreach (array_keys($this->handlers) as $alias) {
+            if (isset($handlers[$alias])) {
+                $sortedHandlers[$alias] = $handlers[$alias];
             }
         }
 
         $event->getRequest()->attributes->set('_tesla_ws_chain', $responseChain);
-        $event->getRequest()->attributes->set('_tesla_ws_handlers', $annotationHandlers);
-
+        $event->getRequest()->attributes->set('_tesla_ws_handlers', $sortedHandlers);
         $annotations = $event->getRequest()->attributes->get('_tesla_ws_chain');
         foreach ($event->getRequest()->attributes->get('_tesla_ws_handlers') as $alias => $handler) {
-
             if ($handler instanceof RequestHandlerInterface) {
-
                 $handler->handleRequest($annotations[$alias], $event);
             }
         }
