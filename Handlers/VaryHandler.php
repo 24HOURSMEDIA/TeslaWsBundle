@@ -58,6 +58,7 @@ class VaryHandler implements RequestHandlerInterface, ResponseHandlerInterface
      */
     function handleResponse(array $annotations, FilterResponseEvent $event)
     {
+
         // get the vary headers from the attributes
         $vary = $event->getRequest()->attributes->get(self::VARY_ATTRIBUTE_NAME, array());
         if (count($vary)) {

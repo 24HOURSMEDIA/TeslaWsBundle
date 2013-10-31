@@ -7,6 +7,8 @@ services:
 #        class: %tesla_ws.example.class%
 #        arguments: [@service_id, "plain_value", %parameter%]
 
+    _tesla_ws.header_test_transformer:
+        class: Tesla\Bundle\WsBundle\Mock\HeaderNormalizeTestService
 
     tesla_ws.vary_handler:
         class: Tesla\Bundle\WsBundle\Handlers\VaryHandler
@@ -15,6 +17,14 @@ services:
     tesla_ws.json_handler:
         class: Tesla\Bundle\WsBundle\Handlers\JsonHandler
         public: false
+        arguments:
+            - %KERNEL.ENVIRONMENT%
+
+    tesla_ws.normalize_header_handler:
+        class: Tesla\Bundle\WsBundle\Handlers\TransformHeaderHandler
+        public: false
+        calls:
+            - [setContainer, [@service_container]]
 
 
     tesla_ws.handler_activator:
@@ -27,6 +37,7 @@ services:
         calls:
             - [setLogger, [@logger]]
             # add handlers for annotation alias name
+            - [addHandler, [tesla_ws_normalize_header, @tesla_ws.normalize_header_handler]]
             - [addHandler, [tesla_ws_json, @tesla_ws.json_handler]]
             - [addHandler, [tesla_ws_vary, @tesla_ws.vary_handler]]
         tags:

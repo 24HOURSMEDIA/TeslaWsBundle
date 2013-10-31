@@ -101,6 +101,9 @@ class HandlerActivator
 
     private function getHandler(WS\Annotation $annotation)
     {
+        if (!isset($this->handlers[$annotation->getAliasName()])) {
+            throw new \RuntimeException('Handler ' . $annotation->getAliasName() . ' not found for annotation ' . get_class($annotation));
+        }
         return $this->handlers[$annotation->getAliasName()];
 
     }
@@ -147,7 +150,7 @@ class HandlerActivator
     function onKernelResponse(FilterResponseEvent $event)
     {
         $annotations = $event->getRequest()->attributes->get('_tesla_ws_chain');
-        foreach ($event->getRequest()->attributes->get('_tesla_ws_handlers') as $alias => $handler) {
+        foreach ($event->getRequest()->attributes->get('_tesla_ws_handlers', array()) as $alias => $handler) {
             if ($handler instanceof ResponseHandlerInterface) {
                 $handler->handleResponse($annotations[$alias], $event);
             }
@@ -158,7 +161,7 @@ class HandlerActivator
     function onKernelView(GetResponseForControllerResultEvent $event)
     {
         $annotations = $event->getRequest()->attributes->get('_tesla_ws_chain');
-        foreach ($event->getRequest()->attributes->get('_tesla_ws_handlers') as $alias => $handler) {
+        foreach ($event->getRequest()->attributes->get('_tesla_ws_handlers', array()) as $alias => $handler) {
             if ($handler instanceof ViewHandlerInterface) {
                 $handler->handleView($annotations[$alias], $event);
             }
@@ -169,7 +172,7 @@ class HandlerActivator
     function onKernelException(GetResponseForExceptionEvent $event)
     {
         $annotations = $event->getRequest()->attributes->get('_tesla_ws_chain');
-        foreach ($event->getRequest()->attributes->get('_tesla_ws_handlers') as $alias => $handler) {
+        foreach ($event->getRequest()->attributes->get('_tesla_ws_handlers', array()) as $alias => $handler) {
             if ($handler instanceof ExceptionHandlerInterface) {
                 $handler->handleException($annotations[$alias], $event);
             }

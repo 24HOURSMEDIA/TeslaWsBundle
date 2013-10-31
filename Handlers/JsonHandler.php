@@ -26,11 +26,13 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class JsonHandler implements ViewHandlerInterface, ExceptionHandlerInterface
 {
 
-    /**
-     * @DI\Inject("%KERNEL.ENVIRONMENT%")
-     * @var string
-     */
-    public $executionEnvironment = '';
+
+    private $executionEnvironment = '';
+
+    public function __construct($env)
+    {
+        $this->executionEnvironment = $env;
+    }
 
     /**
      * Called when the controller does throws an exception
@@ -42,6 +44,7 @@ class JsonHandler implements ViewHandlerInterface, ExceptionHandlerInterface
      */
     function handleException(array $annotations, GetResponseForExceptionEvent $event)
     {
+
         $annotation = $annotations[0];
         $exception = $event->getException();
         if ($exception  instanceof HttpException) {
