@@ -52,9 +52,9 @@ class TransformHeaderHandler implements ContainerAwareInterface, RequestHandlerI
     {
         $headers = $event->getRequest()->headers;
         foreach ($annotations as $annot) {
-            if ($headers->has($annot->getHeader())) {
-                $hvalues = $headers->get($annot->getHeader());
-                if (!is_array($hvalues)) {
+
+            $hvalues = $headers->get($annot->getHeader(), null);
+            if (!is_array($hvalues)) {
                     $hvalues = array($hvalues);
                 }
                 $rvalues = array();
@@ -72,7 +72,7 @@ class TransformHeaderHandler implements ContainerAwareInterface, RequestHandlerI
                     $rvalues[] = $transformer->{$annot->getMethod()}($h);
                 }
                 $headers->set($annot->getHeader(), $rvalues);
-            }
+
         }
     }
 
