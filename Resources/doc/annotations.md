@@ -84,7 +84,7 @@ Usage:
 ```php
 
     /**
-     * @WS\ReverseProxyCache(grace="20 seconds")
+     * @WS\ReverseProxyCache(grace="+20 seconds")
      * @SF\Cache(expires="+10 seconds", public="true")
      * @WS\Vary("user-agent")
      */
