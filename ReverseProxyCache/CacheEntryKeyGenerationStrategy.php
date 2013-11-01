@@ -16,9 +16,8 @@ use Symfony\Component\HttpFoundation\Request;
 class CacheEntryKeyGenerationStrategy
 {
 
-    private $salt = '214qk22';
+    private $salt = '';
 
-    private $debug = false;
 
     public function __construct($salt)
     {
@@ -33,9 +32,7 @@ class CacheEntryKeyGenerationStrategy
         }
         ksort($v);
         $compound = array($request->getUri(), $v);
-        if ($this->debug) {
-            return json_encode($compound);
-        }
+
         return
             sha1(
                 json_encode(

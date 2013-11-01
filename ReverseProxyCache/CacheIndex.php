@@ -155,5 +155,24 @@ class CacheIndex
         return $ttl < 0 ? 0 : 0;
     }
 
+    /**
+     * Removes expired entries from the index saving some space in the cache
+     * returns array with expired entries so they can be removed from the cache
+     * @param $time
+     */
+    public function cleanIndex($time)
+    {
+        if (!$time) {
+            $time = new \DateTime();
+        }
+        $ret = array();
+        foreach ($this->entries as $k => $v) {
+            if ($v->isInvalid()) {
+                $ret[] = $v;
+                unset($this->entries[$k]);
+            }
+        }
+        return $ret;
+    }
 
 } 

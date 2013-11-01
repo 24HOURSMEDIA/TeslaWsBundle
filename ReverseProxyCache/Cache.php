@@ -136,6 +136,12 @@ class Cache
         $entryTtl = $entry->getTtl($now);
         $indexTtl = $index->getTtl($now);
 
+        // clean up index and cache
+        $invalidEntries = $index->cleanIndex($now);
+        foreach ($invalidEntries as $invalidEntry) {
+            $this->storage->delete($invalidEntry->getKey());
+        }
+
 
         $this->storage->save($index->getKey(), $index, $indexTtl);
         $this->storage->save($entry->getKey(), $response, $entryTtl);

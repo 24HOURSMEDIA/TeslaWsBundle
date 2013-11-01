@@ -18,7 +18,6 @@ class CacheIndexKeyGenerationStrategy
 
     private $salt = '214qkdyf2c';
 
-    private $debug = false;
 
     public function __construct($salt)
     {
@@ -29,9 +28,7 @@ class CacheIndexKeyGenerationStrategy
     {
 
         $compound = array($request->getUri());
-        if ($this->debug) {
-            return json_encode($compound);
-        }
+
         return sha1(
             json_encode(
                 $compound
