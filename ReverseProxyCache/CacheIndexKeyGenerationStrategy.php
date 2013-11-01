@@ -20,6 +20,11 @@ class CacheIndexKeyGenerationStrategy
 
     private $debug = false;
 
+    public function __construct($salt)
+    {
+        $this->salt = $salt;
+    }
+
     public function getKey(Request $request)
     {
 

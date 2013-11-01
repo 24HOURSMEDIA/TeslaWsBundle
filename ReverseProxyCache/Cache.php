@@ -31,10 +31,10 @@ class Cache
      */
     private $storage;
 
-    public function __construct(CacheInterface $storage)
+    public function __construct(CacheInterface $storage, $salt1, $salt2)
     {
-        $this->indexKeyGenerationStrategy = new CacheIndexKeyGenerationStrategy();
-        $this->entryKeyGenerationStrategy = new CacheEntryKeyGenerationStrategy();
+        $this->indexKeyGenerationStrategy = new CacheIndexKeyGenerationStrategy($salt1);
+        $this->entryKeyGenerationStrategy = new CacheEntryKeyGenerationStrategy($salt2);
         $this->storage = $storage;
     }
 
@@ -115,6 +115,7 @@ class Cache
 
         // create an entry for the response
         $entryKey = $this->entryKeyGenerationStrategy->getKey($index, $request);
+
         $entry = $index->getEntry($entryKey);
         if (!$entry) {
             $entry = CacheIndexEntry::create($entryKey);

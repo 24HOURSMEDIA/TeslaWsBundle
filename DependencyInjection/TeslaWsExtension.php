@@ -27,5 +27,8 @@ class TeslaWsExtension extends Extension
 
         $container->setParameter('_tesla_ws.reverse_proxy_cache.config', $config['reverse_proxy_cache']);
 
+        $container->setParameter('_tesla_ws.reverse_proxy_cache.salt1', uniqid());
+        $container->setParameter('_tesla_ws.reverse_proxy_cache.salt2', uniqid());
+
     }
 }

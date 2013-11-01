@@ -20,6 +20,11 @@ class CacheEntryKeyGenerationStrategy
 
     private $debug = false;
 
+    public function __construct($salt)
+    {
+        $this->salt = $salt;
+    }
+
     public function getKey(CacheIndex $index, Request $request)
     {
         $v = array();

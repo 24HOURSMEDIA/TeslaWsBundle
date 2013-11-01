@@ -44,6 +44,8 @@ services:
         public: false
         arguments:
             - ~ #@tesla_ws.reverse_proxy_storage
+            - %_tesla_ws.reverse_proxy_cache.salt1%
+            - %_tesla_ws.reverse_proxy_cache.salt2%
         #lazy: true
 
 
