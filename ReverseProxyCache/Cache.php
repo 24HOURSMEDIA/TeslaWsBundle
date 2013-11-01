@@ -31,11 +31,14 @@ class Cache
      */
     private $storage;
 
-    public function __construct(CacheInterface $storage, $salt1, $salt2)
+    private $allowPrivate = false;
+
+    public function __construct(CacheInterface $storage, $salt1, $salt2, $allowPrivate)
     {
         $this->indexKeyGenerationStrategy = new CacheIndexKeyGenerationStrategy($salt1);
         $this->entryKeyGenerationStrategy = new CacheEntryKeyGenerationStrategy($salt2);
         $this->storage = $storage;
+        $this->allowPrivate = $allowPrivate;
     }
 
     private function getIndex(Request $request)
@@ -102,6 +105,12 @@ class Cache
 
     function save(Request $request, Response $response, $grace)
     {
+
+        // prevent from private caching
+        if (!$response->isCacheable() && !$this->allowPrivate) {
+            return;
+        }
+
         $now = new \DateTime();
         // create an index
         $index = $this->getIndex($request);
@@ -147,7 +156,7 @@ class Cache
         $this->storage->save($entry->getKey(), $response, $entryTtl);
 
         $this->visitCacheEntry($entry);
-        return $entry;
+
     }
 
 

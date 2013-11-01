@@ -36,6 +36,7 @@ class Configuration implements ConfigurationInterface
         $node = $parent->children()->arrayNode('reverse_proxy_cache')->info('configuration of the reverse proxy cache');
         $node->children()->booleanNode('enabled')->defaultFalse()->info('indicate whether the reverse proxy is active');
         $node->children()->scalarNode('storage_service')->defaultNull()->info('storage service id for caching. must implement methods like Doctrine\Common\Cache\Cache as CacheInterface');
+        $node->children()->booleanNode('allow_private')->defaultFalse()->info('Wether the cache stores responses marked as private. Take care when setting this option so that any response header identifying a user is taken into the vary headers');
 
     }
 }

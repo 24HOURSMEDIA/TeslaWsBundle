@@ -43,11 +43,13 @@ services:
     tesla_ws.reverse_proxy_cache:
         class: Tesla\Bundle\WsBundle\ReverseProxyCache\Cache
         public: false
+        lazy: true
         arguments:
             - ~ #@tesla_ws.reverse_proxy_storage
             - %_tesla_ws.reverse_proxy_cache.salt1%
             - %_tesla_ws.reverse_proxy_cache.salt2%
-        #lazy: true
+            - %_tesla_ws.reverse_proxy_cache.allow_private%
+
 
 
     tesla_ws.handler_activator:

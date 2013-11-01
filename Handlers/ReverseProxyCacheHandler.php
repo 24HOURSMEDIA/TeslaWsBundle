@@ -52,6 +52,11 @@ class ReverseProxyCacheHandler implements PostResponseHandlerInterface, KernelRe
     {
 
         $request = $event->getRequest();
+
+        if (
+            $request->getMethod() != 'GET'
+        ) return;
+
         // get the context
         /* @var Context $context */
         $context = $request->attributes->get('_tesla_ws_context');
@@ -88,6 +93,11 @@ class ReverseProxyCacheHandler implements PostResponseHandlerInterface, KernelRe
     function handleRequest(array $annotations, FilterControllerEvent $event)
     {
         $request = $event->getRequest();
+
+        if (
+            $request->getMethod() != 'GET'
+        ) return;
+
         // get the context
         /* @var Context $context */
         $context = $request->attributes->get('_tesla_ws_context');
@@ -126,6 +136,11 @@ class ReverseProxyCacheHandler implements PostResponseHandlerInterface, KernelRe
     function handlePostResponse(array $annotations, PostResponseEvent $event)
     {
         $request = $event->getRequest();
+
+        if (
+            $request->getMethod() != 'GET'
+        ) return;
+
         // get the context
         /* @var Context $context */
         $context = $request->attributes->get('_tesla_ws_context');
