@@ -31,6 +31,7 @@ services:
     tesla_ws.reverse_proxy_cache_handler:
         class: Tesla\Bundle\WsBundle\Handlers\ReverseProxyCacheHandler
         public: false
+        lazy: true
         arguments:
             - @tesla_ws.reverse_proxy_cache
         calls:
