@@ -34,7 +34,7 @@ class ReverseProxyCacheHandler implements PostResponseHandlerInterface, KernelRe
      */
     private $logger;
 
-    public function __construct(Cache $cache)
+    public function __construct(Cache $cache = null)
     {
         $this->cache = $cache;
     }
@@ -50,6 +50,7 @@ class ReverseProxyCacheHandler implements PostResponseHandlerInterface, KernelRe
      */
     function handleKernelRequest(GetResponseEvent $event)
     {
+
         $request = $event->getRequest();
         // get the context
         /* @var Context $context */

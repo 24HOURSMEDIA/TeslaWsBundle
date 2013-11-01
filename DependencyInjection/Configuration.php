@@ -2,6 +2,8 @@
 
 namespace Tesla\Bundle\WsBundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\ArrayNode;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -15,15 +17,25 @@ class Configuration implements ConfigurationInterface
     /**
      * {@inheritDoc}
      */
-    public function getConfigTreeBuilder()
+    function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('tesla_ws');
 
+        $this->buildReverseProxyConfig($rootNode);
         // Here you should define the parameters that are allowed to
         // configure your bundle. See the documentation linked above for
         // more information on that topic.
 
+
         return $treeBuilder;
+    }
+
+    function buildReverseProxyConfig(ArrayNodeDefinition $parent)
+    {
+        $node = $parent->children()->arrayNode('reverse_proxy_cache')->info('configuration of the reverse proxy cache');
+        $node->children()->booleanNode('enabled')->defaultFalse()->info('indicate whether the reverse proxy is active');
+        $node->children()->scalarNode('storage_service')->defaultNull()->info('storage service id for caching. must implement methods like Doctrine\Common\Cache\Cache as CacheInterface');
+
     }
 }

@@ -106,7 +106,8 @@ class HandlerActivator
     private function getHandler(WS\Annotation $annotation)
     {
         if (!isset($this->handlers[$annotation->getAliasName()])) {
-            throw new \RuntimeException('Handler ' . $annotation->getAliasName() . ' not found for annotation ' . get_class($annotation));
+            // throw new \RuntimeException('Handler ' . $annotation->getAliasName() . ' not found for annotation ' . get_class($annotation));
+            return;
         }
         return $this->handlers[$annotation->getAliasName()];
 
@@ -143,7 +144,13 @@ class HandlerActivator
                     $responseChain[$alias][] = $annotation;
                 }
                 if (!isset($handlers[$alias])) {
-                    $handlers[$alias] = $this->getHandler($annotation);
+                    $handler = $this->getHandler($annotation);
+                    if ($handler) {
+                        $handlers[$alias] = $handler;
+                    } else {
+
+                    }
+
                 }
             }
         }

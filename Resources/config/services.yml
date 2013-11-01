@@ -7,18 +7,7 @@ services:
 #        class: %tesla_ws.example.class%
 #        arguments: [@service_id, "plain_value", %parameter%]
 
-    tesla_ws.memcache_driver:
-         class: Memcache
-         public: false
-         calls:
-             - [addServer, [localhost, 11211]]
 
-    tesla_ws.reverse_proxy_storage:
-         class: %doctrine.orm.cache.memcache.class%
-         public: false
-         calls:
-             - [setNamespace, ['reverseproxy']]
-             - [setMemcache, [@tesla_client.memcache_driver]]
 
     _tesla_ws.header_test_transformer:
         class: Tesla\Bundle\WsBundle\Mock\HeaderNormalizeTestService
@@ -54,7 +43,7 @@ services:
         class: Tesla\Bundle\WsBundle\ReverseProxyCache\Cache
         public: false
         arguments:
-            - @tesla_ws.reverse_proxy_storage
+            - ~ #@tesla_ws.reverse_proxy_storage
         #lazy: true
 
 
@@ -68,7 +57,7 @@ services:
         calls:
             - [setLogger, [@logger]]
             # add handlers for annotation alias name (ordering equals priority)
-            - [addHandler, [tesla_ws_reverse_proxy_cache, @tesla_ws.reverse_proxy_cache_handler]]
+            # (added by compiler) - [addHandler, [tesla_ws_reverse_proxy_cache, @tesla_ws.reverse_proxy_cache_handler]]
             - [addHandler, [tesla_ws_transform_header, @tesla_ws.normalize_header_handler]]
             - [addHandler, [tesla_ws_vary, @tesla_ws.vary_handler]]
             - [addHandler, [tesla_ws_json, @tesla_ws.json_handler]]
