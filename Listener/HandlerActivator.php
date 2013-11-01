@@ -11,20 +11,23 @@
 
 namespace Tesla\Bundle\WsBundle\Listener;
 
-
+use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\PostResponseEvent;
 use Tesla\Bundle\WsBundle\Annotation as WS;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Annotations\Reader;
 use Tesla\Bundle\WsBundle\Handlers\ExceptionHandlerInterface;
-use Tesla\Bundle\WsBundle\Handlers\JsonHandler;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+
+use Tesla\Bundle\WsBundle\Handlers\PostResponseHandlerInterface;
 use Tesla\Bundle\WsBundle\Handlers\RequestHandlerInterface;
 use Tesla\Bundle\WsBundle\Handlers\ResponseHandlerInterface;
 use Tesla\Bundle\WsBundle\Handlers\ViewHandlerInterface;
+use Tesla\Bundle\WsBundle\Handlers\KernelRequestHandlerInterface;
+
 use Doctrine\Common\Annotations\FileCacheReader;
 
 
@@ -109,8 +112,18 @@ class HandlerActivator
 
     }
 
+    function onKernelRequest(GetResponseEvent $event)
+    {
+        foreach ($this->handlers as $handler) {
+            if ($handler instanceof KernelRequestHandlerInterface) {
+                $handler->handleKernelRequest($event);
+            }
+        }
+    }
+
     function onKernelController(FilterControllerEvent $event)
     {
+
 
         if (!is_array($controller = $event->getController())) {
             return;
@@ -183,6 +196,19 @@ class HandlerActivator
         foreach ($event->getRequest()->attributes->get('_tesla_ws_handlers', array()) as $alias => $handler) {
             if ($handler instanceof ExceptionHandlerInterface) {
                 $handler->handleException($annotations[$alias], $event);
+            }
+        }
+    }
+
+    function onKernelTerminate(PostResponseEvent $event)
+    {
+
+        $annotations = $event->getRequest()->attributes->get('_tesla_ws_chain');
+        foreach ($event->getRequest()->attributes->get('_tesla_ws_handlers', array()) as $alias => $handler) {
+
+            if ($handler instanceof PostResponseHandlerInterface) {
+
+                $handler->handlePostResponse($annotations[$alias], $event);
             }
         }
     }

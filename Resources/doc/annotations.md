@@ -70,6 +70,33 @@ class MyController {
 
 Will pass the user agent header to the normalize filter of service with id _tesla_ws.header_test_transformer
 
+## WS\ReverseProxyCache
+
+Activates a reverse proxy cache on a controller method. This is an advanced cache that works like this:
+- In the controller method, define a cache time using default cache responses in the Response object
+- Set the WS\ReverseProxyCache annotation on the method and define a grace time
+- When a cache entry is expired, the server still serves the cached entry unless the grace time has passed
+- AFTER the above mentioned cache entry is served, the controller method is executed nonetheless and the new entry cached
+- This results in creating new cache entries in the background
+- So the maximum cache entry age is CACHE_EXPIRES + GRACE_TIME
+
+Usage:
+```php
+
+    /**
+     * @WS\ReverseProxyCache(grace="20 seconds")
+     * @SF\Cache(expires="+10 seconds", public="true")
+     * @WS\Vary("user-agent")
+     */
+    function indexAction(Request $request) {
+    }
+```
+
+This will lead to most entries having a max cache age of 10 seconds; incidently, an entry will be served with a max age of 30
+seconds. If during 30 seconds no entry has been requested, no caching takes place; before 30 seconds, there will always be a
+fast response.
+
+
 
 
 

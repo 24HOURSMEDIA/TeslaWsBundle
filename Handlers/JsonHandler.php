@@ -84,6 +84,7 @@ class JsonHandler implements ViewHandlerInterface, ExceptionHandlerInterface
      */
     function handleView(array $annotations, GetResponseForControllerResultEvent $event)
     {
+
         // $annotation = $annotations[0];
         $event->setResponse(
             Response::create(
