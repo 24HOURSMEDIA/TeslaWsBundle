@@ -27,10 +27,6 @@ class CacheIndex
      */
     private $vary;
 
-    /**
-     * @var string
-     */
-    private $expires;
 
     /**
      * @var CacheIndexEntry[]
@@ -114,23 +110,6 @@ class CacheIndex
         return $this->vary;
     }
 
-    /**
-     * @param mixed $expires
-     * @return $this
-     */
-    public function setExpires($expires)
-    {
-        $this->expires = $expires->format('c');
-        return $this;
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getExpires()
-    {
-        return new \DateTime($this->expires);
-    }
 
     public function getEntry($key)
     {
@@ -162,6 +141,18 @@ class CacheIndex
     public function getKey()
     {
         return $this->key;
+    }
+
+    public function getTtl($time)
+    {
+        if (!$time) {
+            $time = new \DateTime();
+        }
+        $ttl = 0;
+        foreach ($this->entries as $entry) {
+            $ttl = max($ttl, $entry->getTtl($time));
+        }
+        return $ttl < 0 ? 0 : 0;
     }
 
 

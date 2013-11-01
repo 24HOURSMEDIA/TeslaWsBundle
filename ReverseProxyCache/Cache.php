@@ -14,6 +14,7 @@ namespace Tesla\Bundle\WsBundle\ReverseProxyCache;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Common\Cache\Cache as CacheInterface;
+use Tesla\Bundle\WsBundle\ReverseProxyCache\CacheIndexEntry;
 
 class Cache
 {
@@ -39,7 +40,6 @@ class Cache
 
     private function getIndex(Request $request)
     {
-        $now = new \DateTime();
         $key = $this->indexKeyGenerationStrategy->getKey($request);
         // attempt to load the index from local cache, then from storage
         if (isset($this->indices[$key])) {
@@ -50,10 +50,33 @@ class Cache
         if (is_object($index) && $index instanceof CacheIndex) {
             return $this->indices[$key] = $index;
         }
-
         return null;
     }
 
+    /**
+     * 'visits' the entry and apply some headers to the response
+     * @param CacheIndexEntry $entry
+     */
+    private function visitCacheEntry(CacheIndexEntry $entry)
+    {
+        $now = new \DateTime();
+        $response = $entry->getResponse();
+        $response->headers->set('age', $now->getTimestamp() - $response->getDate()->getTimestamp());
+
+        /*
+        $response->headers->set('X-Tesla-Rpc-Expires', $entry->getExpires()->format('c'));
+        $response->headers->set('X-Tesla-Rpc-Ext-Expires', $entry->getExtendedExpiration()->format('c'));
+        $response->headers->set('X-Tesla-Rpc-Is-Valid', $entry->isInvalid($now) ? 'invalid' : 'valid');
+        $response->headers->set('X-Tesla-Rpc-Is-Fresh', $entry->isFresh($now) ? 'fresh' : '-');
+        $response->headers->set('X-Tesla-Rpc-Is-Stale', $entry->isStale($now) ? 'stale' : '-');
+        */
+        return $this;
+    }
+
+    /**
+     * @param Request $request
+     * @return CacheIndexEntry|null
+     */
     function load(Request $request)
     {
         $now = new \DateTime();
@@ -63,14 +86,13 @@ class Cache
         }
         $entryKey = $this->entryKeyGenerationStrategy->getKey($index, $request);
         $entry = $index->getEntry($entryKey);
-        if (is_object($entry)) {
-            // check expiration!
-            $response = $this->storage->fetch($entryKey);
-            if ($response instanceof Response) {
-                if ($now < $response->getExpires()) {
-                    return $response;
-                } else {
-                    //        die('expired');
+        if ($entry instanceof CacheIndexEntry) {
+            if (!$entry->isInvalid($now)) {
+                $response = $this->storage->fetch($entryKey);
+                if ($response instanceof Response) {
+                    $entry->setResponse($response);
+                    $this->visitCacheEntry($entry);
+                    return $entry;
                 }
             }
         }
@@ -81,18 +103,17 @@ class Cache
     function save(Request $request, Response $response, $grace)
     {
         $now = new \DateTime();
-
+        // create an index
         $index = $this->getIndex($request);
         if (!$index) {
             $key = $this->indexKeyGenerationStrategy->getKey($request);
             $index = CacheIndex::create($key)->setUri($request->getUri());
         }
-        $indexExpires = new \DateTime('+20 minute');
-        $index
-            ->setVary($response->headers->get('vary', array()))
-            ->setExpires($indexExpires);
 
-        //   echo "\n\n\n";var_dump($index);
+        $index
+            ->setVary($response->headers->get('vary', array()));
+
+        // create an entry for the response
         $entryKey = $this->entryKeyGenerationStrategy->getKey($index, $request);
         $entry = $index->getEntry($entryKey);
         if (!$entry) {
@@ -103,23 +124,23 @@ class Cache
         foreach ($index->getVary() as $h) {
             $requestVaryHeaders[$h] = $request->headers->get($h, null);
         }
-        $entry->setHeaders($requestVaryHeaders);
-        $entry->setExpires($response->getExpires());
-        $entry->setGrace($grace);
+        $entry
+            ->setHeaders($requestVaryHeaders)
+            ->setExpires($response->getExpires())
+            ->setGrace($grace)
+            ->setResponse($response);;
         $index->setEntry($entry);
 
-        $interval = \DateInterval::createFromDateString($entry->getGrace());
-        $extendedExpiration = clone($entry->getExpires());
-        $extendedExpiration->add($interval);
-        $response->headers->set('X-Original-Expiration', $response->getExpires()->format('D, d M Y H:i:s \G\M\T'));
-        $response->headers->set('X-Grace', $entry->getGrace());
-        $response->setExpires($extendedExpiration);
 
-        $ttl = $index->getExpires()->getTimestamp() - $now->getTimestamp();
-        $this->storage->save($index->getKey(), $index, $ttl);
-        $this->storage->save($entry->getKey(), $response);
+        $entryTtl = $entry->getTtl($now);
+        $indexTtl = $index->getTtl($now);
 
 
+        $this->storage->save($index->getKey(), $index, $indexTtl);
+        $this->storage->save($entry->getKey(), $response, $entryTtl);
+
+        $this->visitCacheEntry($entry);
+        return $entry;
     }
 
 

@@ -44,6 +44,11 @@ services:
         public: false
         arguments:
             - @tesla_ws.reverse_proxy_cache
+        calls:
+            - [setLogger, [@logger]]
+
+
+
 
     tesla_ws.reverse_proxy_cache:
         class: Tesla\Bundle\WsBundle\ReverseProxyCache\Cache

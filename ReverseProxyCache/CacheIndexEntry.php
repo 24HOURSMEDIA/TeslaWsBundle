@@ -11,6 +11,7 @@
 
 namespace Tesla\Bundle\WsBundle\ReverseProxyCache;
 
+use Symfony\Component\HttpFoundation\Response;
 
 class CacheIndexEntry
 {
@@ -31,6 +32,16 @@ class CacheIndexEntry
     private $grace = 0;
 
     private $headers = array();
+
+    /**
+     * @var Response
+     */
+    private $response;
+
+    public function __sleep()
+    {
+        return array('key', 'created', 'expires', 'grace', 'headers');
+    }
 
     static function create($key)
     {
@@ -96,7 +107,19 @@ class CacheIndexEntry
     }
 
     /**
-     * @param int $grace
+     * Returns the extended expiration time (including the grace time)
+     * @return \DateTime
+     */
+    public function getExtendedExpiration()
+    {
+        $interval = \DateInterval::createFromDateString($this->getGrace());
+        $extendedExpiration = clone($this->getExpires());
+        $extendedExpiration->add($interval);
+        return $extendedExpiration;
+    }
+
+    /**
+     * @param string $grace
      * @return $this
      */
     public function setGrace($grace)
@@ -106,12 +129,66 @@ class CacheIndexEntry
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getGrace()
     {
         return $this->grace;
     }
 
+    /**
+     * Returns the response
+     * @param \Symfony\Component\HttpFoundation\Response $response
+     * @return $this
+     */
+    public function setResponse($response)
+    {
+        $this->response = $response;
+        return $this;
+    }
 
-} 
+    /**
+     * Gets the response
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function getResponse()
+    {
+        return $this->response;
+    }
+
+    public function isFresh($time = null)
+    {
+        if (!$time) {
+            $time = new \DateTime();
+        }
+        return $time < $this->getExpires();
+    }
+
+    public function isStale($time = null)
+    {
+        if (!$time) {
+            $time = new \DateTime();
+        }
+        return $time > $this->getExpires();
+    }
+
+
+    public function isInvalid($time = null)
+    {
+        if (!$time) {
+            $time = new \DateTime();
+        }
+        return $time > $this->getExtendedExpiration();
+    }
+
+    public function getTtl($time = null)
+    {
+        if (!$time) {
+            $time = new \DateTime();
+        }
+        $ttl = $this->getExtendedExpiration($time)->getTimestamp() - $time->getTimestamp();
+        return $ttl < 0 ? 0 : 0;
+    }
+
+
+}
