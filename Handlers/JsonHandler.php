@@ -15,7 +15,7 @@ namespace Tesla\Bundle\WsBundle\Handlers;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 use Tesla\Bundle\WsBundle\Annotation\Annotation;
-use Tesla\Bundle\ClientBundle\Client\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
